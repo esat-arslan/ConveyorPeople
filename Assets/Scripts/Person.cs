@@ -10,16 +10,24 @@ public class Person : MonoBehaviour
     private Vector3 currentWaypoint;
     private PersonStates personState;
     private WaitingSlot assignedSlot;
+    private ConveyorQueueSlot assignedQueueSlot;
 
     public event Action<Person> OnEndOfThePath;
+    public event Action<Person> OnStartOfQueue;
 
     public void Initialize(ConveyorPath path)
     {
         conveyorPath = path;
         currentWaypointIndex = 0;
         personState = PersonStates.OnConveyor;
-        StartCoroutine(FollowPathRoutine());
+        Debug.Log("Initialize called!");
+        //StartCoroutine(FollowPathRoutine());
 
+    }
+
+    public void EnterQueue()
+    {
+        OnStartOfQueue?.Invoke(this);
     }
     private IEnumerator FollowPathRoutine()
     {
@@ -42,6 +50,7 @@ public class Person : MonoBehaviour
         OnEndOfThePath?.Invoke(this);
     }
 
+
     private IEnumerator MoveToWaitingSlot()
     {
         Vector3 target = assignedSlot.Position;
@@ -57,12 +66,36 @@ public class Person : MonoBehaviour
         }
     }
 
+    private IEnumerator MoveToQueueSlot()
+    {
+        Vector3 target = assignedQueueSlot.Position;
+        Debug.Log($"target is {target}");
+        while ((transform.position - target).sqrMagnitude > 0.001f)
+        {
+            transform.position = Vector3.MoveTowards(
+                transform.position,
+                target,
+                speed * Time.deltaTime
+            );
+            yield return null;
+        }
+    }
+
     public void AssignWaitingSlot(WaitingSlot slot)
     {
         assignedSlot = slot;
         personState = PersonStates.Waiting;
         Debug.Log($"Assigned slot is {assignedSlot.gameObject.name}");
         StartCoroutine(MoveToWaitingSlot());
+    }
+
+    public void AssignQueueSlot(ConveyorQueueSlot queueSlot)
+    {
+        Debug.Log("AssignQueueSlot called");
+        assignedQueueSlot = queueSlot;
+        personState = PersonStates.OnConveyor;
+        Debug.Log($"Queue slot is {assignedQueueSlot.gameObject.name}");
+        StartCoroutine(MoveToQueueSlot());
     }
 
     public void PickUp()

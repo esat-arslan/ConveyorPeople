@@ -9,8 +9,9 @@ public class PersonSpawner : MonoBehaviour
     public void SpawnPerson()
     {
         Person person = Instantiate(personPrefab, transform.position, Quaternion.identity);
-        person.Initialize(conveyorPath);
         assigmentSystem.RegisterPerson(person);
+        person.Initialize(conveyorPath);
+        person.EnterQueue();
     }
 
 

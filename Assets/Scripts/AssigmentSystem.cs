@@ -30,6 +30,7 @@ public class AssignmentSystem : MonoBehaviour
         conveyorQueueSlots.Add(queueSlot);
     }
 
+
     public void RegisterPerson(Person person)
     {
         if (person is null)
@@ -37,6 +38,8 @@ public class AssignmentSystem : MonoBehaviour
 
         activePeople.Add(person);
         person.OnEndOfThePath += HandlePersonReachedEnd;
+        person.OnStartOfQueue += HandlePersonSpawned;
+        Debug.Log("RegisterPerson called");
     }
 
     public void UnregisterPerson(Person person)
@@ -45,6 +48,7 @@ public class AssignmentSystem : MonoBehaviour
             return;
 
         person.OnEndOfThePath -= HandlePersonReachedEnd;
+        person.OnStartOfQueue -= HandlePersonSpawned;
         activePeople.Remove(person);
     }
 
@@ -62,6 +66,20 @@ public class AssignmentSystem : MonoBehaviour
         person.AssignWaitingSlot(slot);
     }
 
+    private void HandlePersonSpawned(Person person)
+    {
+        Debug.Log("HandlePersonSpawned called");
+        ConveyorQueueSlot queueSlot = GetNextQueueSlot();
+        if (queueSlot is null)
+        {
+            Debug.Log("No free queue slots!");
+            return;
+        }
+
+        queueSlot.AssignToQueue(person);
+        person.AssignQueueSlot(queueSlot);
+    }
+
     private WaitingSlot GetNextFreeSlot()
     {
         foreach (WaitingSlot slot in waitingSlots)
@@ -70,6 +88,18 @@ public class AssignmentSystem : MonoBehaviour
                 return slot;
         }
 
+        return null;
+    }
+
+    private ConveyorQueueSlot GetNextQueueSlot()
+    {
+        for (int i = conveyorQueueSlots.Count - 1; i >= 0; i--)
+        {
+            if (!conveyorQueueSlots[i].IsOccupied)
+            {
+                return conveyorQueueSlots[i];
+            }
+        }
         return null;
     }
 }
