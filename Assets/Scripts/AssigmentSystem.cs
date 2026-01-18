@@ -18,6 +18,11 @@ public class AssignmentSystem : MonoBehaviour
         {
             CreateQueueSlot(transform);
         }
+
+        foreach (WaitingSlot slot in waitingSlots)
+        {
+            slot.Clear();
+        }
     }
 
     private void CreateQueueSlot(Transform queuePos)
@@ -28,6 +33,8 @@ public class AssignmentSystem : MonoBehaviour
                                         Quaternion.identity,
                                         queueSlotsParent);
         conveyorQueueSlots.Add(queueSlot);
+        int index = conveyorQueueSlots.IndexOf(queueSlot);
+        queueSlot.SetQueueIndex(index);
     }
 
 
@@ -38,41 +45,70 @@ public class AssignmentSystem : MonoBehaviour
 
         activePeople.Add(person);
         person.OnEndOfThePath += HandlePersonReachedEnd;
-        person.OnStartOfQueue += HandlePersonSpawned;
+
+        ConveyorQueueSlot queueSlot = GetNextQueueSlot(person);
+        if(queueSlot != null)
+        {
+            queueSlot.AssignToQueue(person);
+            person.AssignQueueSlot(queueSlot);
+        }
         Debug.Log("RegisterPerson called");
     }
 
     public void UnregisterPerson(Person person)
     {
-        if (person is null)
-            return;
+        if (person is null) return;
 
         person.OnEndOfThePath -= HandlePersonReachedEnd;
-        person.OnStartOfQueue -= HandlePersonSpawned;
         activePeople.Remove(person);
     }
 
     private void HandlePersonReachedEnd(Person person)
     {
+        int lastSlotIndex = conveyorQueueSlots.Count -1;
+        if (person.AssignedQueueIndex != lastSlotIndex) return;
         WaitingSlot slot = GetNextFreeSlot();
-
-        if (slot is null)
+        if (slot == null)
         {
-            Debug.LogWarning("No free waiting slots!");
+            Debug.LogWarning($"No free waiting slots!");
             return;
         }
 
+        person.CurrentQueueSlot.Clear();
+
         slot.Assign(person);
         person.AssignWaitingSlot(slot);
+
+        AdvanceQueue();
+    }
+
+    private void AdvanceQueue()
+    {
+        for(int i = conveyorQueueSlots.Count -2; i >= 0; i--)
+        {
+            ConveyorQueueSlot currentSlot = conveyorQueueSlots[i];
+            ConveyorQueueSlot nextSlot = conveyorQueueSlots[i + 1];
+
+            if (currentSlot.IsOccupied && !nextSlot.IsOccupied)
+            {
+                Person personToMove = currentSlot.Occupant;
+
+                currentSlot.Clear();
+
+                nextSlot.AssignToQueue(personToMove);
+
+                personToMove.AssignQueueSlot(nextSlot);
+            }
+        }
     }
 
     private void HandlePersonSpawned(Person person)
     {
         Debug.Log("HandlePersonSpawned called");
-        ConveyorQueueSlot queueSlot = GetNextQueueSlot();
+        ConveyorQueueSlot queueSlot = GetNextQueueSlot(person);
         if (queueSlot is null)
         {
-            Debug.Log("No free queue slots!");
+            Debug.Log($"No free queue slots! current occupant");
             return;
         }
 
@@ -84,14 +120,13 @@ public class AssignmentSystem : MonoBehaviour
     {
         foreach (WaitingSlot slot in waitingSlots)
         {
-            if (!slot.IsOccupied)
-                return slot;
+            if (!slot.IsOccupied) return slot;
         }
 
         return null;
     }
 
-    private ConveyorQueueSlot GetNextQueueSlot()
+    private ConveyorQueueSlot GetNextQueueSlot(Person person)
     {
         for (int i = conveyorQueueSlots.Count - 1; i >= 0; i--)
         {

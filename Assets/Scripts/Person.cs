@@ -4,56 +4,99 @@ using UnityEngine;
 
 public class Person : MonoBehaviour
 {
-    [SerializeField] private float speed = 5f; //Will move it to Conveyor
+    [SerializeField] private float speed = 5f;
     private ConveyorPath conveyorPath;
+    
+    // Logic Variables
     private int currentWaypointIndex;
-    private Vector3 currentWaypoint;
+    private int maxAllowedWaypointIndex;
     private PersonStates personState;
-    private WaitingSlot assignedSlot;
+
+    private WaitingSlot assignedWaitingSlot;
     private ConveyorQueueSlot assignedQueueSlot;
 
+    public ConveyorQueueSlot CurrentQueueSlot { get; private set; }
+    public int AssignedQueueIndex { get; private set; } = -1;
+
     public event Action<Person> OnEndOfThePath;
-    public event Action<Person> OnStartOfQueue;
+
+    private Coroutine movementCoroutine;
 
     public void Initialize(ConveyorPath path)
     {
         conveyorPath = path;
         currentWaypointIndex = 0;
         personState = PersonStates.OnConveyor;
-        Debug.Log("Initialize called!");
-        //StartCoroutine(FollowPathRoutine());
-
     }
 
-    public void EnterQueue()
+    public void AssignQueueSlot(ConveyorQueueSlot queueSlot)
     {
-        OnStartOfQueue?.Invoke(this);
+        Debug.Log($"AssignQueueSlot called: Index {queueSlot.QueueIndex}");
+        assignedQueueSlot = queueSlot;
+        CurrentQueueSlot = queueSlot;
+        AssignedQueueIndex = queueSlot.QueueIndex; 
+        maxAllowedWaypointIndex = queueSlot.QueueIndex;
+
+        if (movementCoroutine != null) StopCoroutine(movementCoroutine);
+        movementCoroutine = StartCoroutine(MasterMovementRoutine());
     }
+
+    public void AssignWaitingSlot(WaitingSlot slot)
+    {
+        assignedWaitingSlot = slot;
+        personState = PersonStates.Waiting;
+        
+        if (movementCoroutine != null) StopCoroutine(movementCoroutine);
+        movementCoroutine = StartCoroutine(MoveToWaitingSlot());
+    }
+
+    private IEnumerator MasterMovementRoutine()
+    {
+        yield return StartCoroutine(FollowPathRoutine());
+
+        if (CurrentQueueSlot != null)
+        {
+            transform.position = CurrentQueueSlot.Position; 
+        }
+
+        Debug.Log("Reached End of assigned path.");
+        OnEndOfThePath?.Invoke(this); 
+    }
+
     private IEnumerator FollowPathRoutine()
     {
         if (conveyorPath is null) yield break;
 
-        while (currentWaypointIndex < conveyorPath.WaypointCount)
+        while (currentWaypointIndex <= maxAllowedWaypointIndex)
         {
-            currentWaypoint = conveyorPath.GetWaypointPos(currentWaypointIndex);
+            Vector3 target = conveyorPath.GetWaypointPos(currentWaypointIndex);
 
-            while ((transform.position - currentWaypoint).sqrMagnitude > 0.001f)
+            while ((transform.position - target).sqrMagnitude > 0.001f)
             {
-                transform.position = Vector3.MoveTowards
-                                            (transform.position, currentWaypoint, speed * Time.deltaTime);
+                transform.position = Vector3.MoveTowards(
+                    transform.position, 
+                    target, 
+                    speed * Time.deltaTime
+                );
                 yield return null;
+            }
+            
+            transform.position = target;
+            
+            if(currentWaypointIndex == maxAllowedWaypointIndex)
+            {
+                break;
             }
 
             currentWaypointIndex++;
         }
-
-        OnEndOfThePath?.Invoke(this);
     }
-
 
     private IEnumerator MoveToWaitingSlot()
     {
-        Vector3 target = assignedSlot.Position;
+        if (assignedWaitingSlot == null) yield break;
+
+        Vector3 target = assignedWaitingSlot.Position;
 
         while ((transform.position - target).sqrMagnitude > 0.001f)
         {
@@ -64,43 +107,14 @@ public class Person : MonoBehaviour
            );
             yield return null;
         }
+        transform.position = target;
     }
 
-    private IEnumerator MoveToQueueSlot()
-    {
-        Vector3 target = assignedQueueSlot.Position;
-        Debug.Log($"target is {target}");
-        while ((transform.position - target).sqrMagnitude > 0.001f)
-        {
-            transform.position = Vector3.MoveTowards(
-                transform.position,
-                target,
-                speed * Time.deltaTime
-            );
-            yield return null;
-        }
-    }
-
-    public void AssignWaitingSlot(WaitingSlot slot)
-    {
-        assignedSlot = slot;
-        personState = PersonStates.Waiting;
-        Debug.Log($"Assigned slot is {assignedSlot.gameObject.name}");
-        StartCoroutine(MoveToWaitingSlot());
-    }
-
-    public void AssignQueueSlot(ConveyorQueueSlot queueSlot)
-    {
-        Debug.Log("AssignQueueSlot called");
-        assignedQueueSlot = queueSlot;
-        personState = PersonStates.OnConveyor;
-        Debug.Log($"Queue slot is {assignedQueueSlot.gameObject.name}");
-        StartCoroutine(MoveToQueueSlot());
-    }
-
+    // Cleanup
     public void PickUp()
     {
-        assignedSlot.Clear();
+        if(assignedWaitingSlot != null) assignedWaitingSlot.Clear();
+        if(CurrentQueueSlot != null) CurrentQueueSlot.Clear();
         Destroy(gameObject);
     }
 }
