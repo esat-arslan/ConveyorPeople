@@ -176,7 +176,7 @@ Transform:
   m_GameObject: {fileID: 252422132}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.38, y: 2.46, z: 0}
+  m_LocalPosition: {x: -1, y: 2.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -220,7 +220,7 @@ Transform:
   m_GameObject: {fileID: 257256785}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.55, y: 2.52, z: 0}
+  m_LocalPosition: {x: 0, y: 2.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -299,6 +299,52 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1770189619}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &360569004
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 360569006}
+  - component: {fileID: 360569005}
+  m_Layer: 0
+  m_Name: PersonPool
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &360569005
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 360569004}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8ee2ffbd2289e414aaf83e093f9127e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PersonPool
+  personPrefab: {fileID: 2328827632849130236, guid: 17482fbe9c3ed9abcaf004f3ce6611b3, type: 3}
+  initialSize: 10
+--- !u!4 &360569006
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 360569004}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.90346, y: 1.90126, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &387429083
 GameObject:
@@ -752,7 +798,7 @@ Transform:
   m_GameObject: {fileID: 1004091980}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.1, y: 2.5, z: 0}
+  m_LocalPosition: {x: -2, y: 2.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -972,6 +1018,7 @@ MonoBehaviour:
   - {fileID: 1498660737}
   - {fileID: 1297569469}
   - {fileID: 318079051}
+  startPosition: {x: -2.8, y: 4.5, z: 0}
 --- !u!212 &1344250909
 SpriteRenderer:
   serializedVersion: 2
@@ -1061,6 +1108,12 @@ MonoBehaviour:
   conveyorPath: {fileID: 1344250908}
   personPrefab: {fileID: 2328827632849130236, guid: 17482fbe9c3ed9abcaf004f3ce6611b3, type: 3}
   assigmentSystem: {fileID: 894975505}
+  colorPool:
+  - {r: 1, g: 0, b: 0, a: 1}
+  - {r: 0, g: 0.043819427, b: 1, a: 1}
+  - {r: 0.020123124, g: 1, b: 0, a: 1}
+  - {r: 1, g: 0.4730277, b: 0, a: 1}
+  pool: {fileID: 360569005}
 --- !u!1 &1412790614
 GameObject:
   m_ObjectHideFlags: 0
@@ -1471,7 +1524,7 @@ Transform:
   m_GameObject: {fileID: 2039822492}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.91, y: 2.59, z: 0}
+  m_LocalPosition: {x: -3, y: 2.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1501,3 +1554,4 @@ SceneRoots:
   - {fileID: 1471490606}
   - {fileID: 1276440365}
   - {fileID: 1005961233}
+  - {fileID: 360569006}

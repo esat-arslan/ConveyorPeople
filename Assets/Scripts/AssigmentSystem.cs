@@ -51,6 +51,7 @@ public class AssignmentSystem : MonoBehaviour
         {
             queueSlot.AssignToQueue(person);
             person.AssignQueueSlot(queueSlot);
+            person.StartConveyorMovement(queueSlot.QueueIndex);
         }
         Debug.Log("RegisterPerson called");
     }
@@ -94,10 +95,8 @@ public class AssignmentSystem : MonoBehaviour
                 Person personToMove = currentSlot.Occupant;
 
                 currentSlot.Clear();
-
+                personToMove.AdvanceToNextQueueSlot(nextSlot);
                 nextSlot.AssignToQueue(personToMove);
-
-                personToMove.AssignQueueSlot(nextSlot);
             }
         }
     }

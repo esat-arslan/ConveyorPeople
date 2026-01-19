@@ -7,6 +7,8 @@ public class ConveyorPath : MonoBehaviour
     private List<Transform> waypoints = new List<Transform>();
     public int WaypointCount => waypoints.Count;
     public List<Transform> Waypoints => waypoints;
+    [SerializeField]private Vector3 startPosition;
+    public Vector3 StartPosition => startPosition;
 
     public Vector3 GetWaypointPos(int index)
     {

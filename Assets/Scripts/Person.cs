@@ -6,6 +6,7 @@ public class Person : MonoBehaviour
 {
     [SerializeField] private float speed = 5f;
     private ConveyorPath conveyorPath;
+    private PersonPool pool;
     
     // Logic Variables
     private int currentWaypointIndex;
@@ -22,23 +23,20 @@ public class Person : MonoBehaviour
 
     private Coroutine movementCoroutine;
 
-    public void Initialize(ConveyorPath path)
+    public void Initialize(ConveyorPath path, PersonPool personPool)
     {
         conveyorPath = path;
+        pool = personPool;
+        ResetState();
         currentWaypointIndex = 0;
         personState = PersonStates.OnConveyor;
     }
 
     public void AssignQueueSlot(ConveyorQueueSlot queueSlot)
     {
-        Debug.Log($"AssignQueueSlot called: Index {queueSlot.QueueIndex}");
         assignedQueueSlot = queueSlot;
         CurrentQueueSlot = queueSlot;
         AssignedQueueIndex = queueSlot.QueueIndex; 
-        maxAllowedWaypointIndex = queueSlot.QueueIndex;
-
-        if (movementCoroutine != null) StopCoroutine(movementCoroutine);
-        movementCoroutine = StartCoroutine(MasterMovementRoutine());
     }
 
     public void AssignWaitingSlot(WaitingSlot slot)
@@ -50,14 +48,18 @@ public class Person : MonoBehaviour
         movementCoroutine = StartCoroutine(MoveToWaitingSlot());
     }
 
+    public void StartConveyorMovement(int targetQueueIndex)
+    {
+        maxAllowedWaypointIndex = targetQueueIndex;
+
+        if (movementCoroutine != null) StopCoroutine(movementCoroutine);
+
+        movementCoroutine = StartCoroutine(MasterMovementRoutine());
+    }
+
     private IEnumerator MasterMovementRoutine()
     {
         yield return StartCoroutine(FollowPathRoutine());
-
-        if (CurrentQueueSlot != null)
-        {
-            transform.position = CurrentQueueSlot.Position; 
-        }
 
         Debug.Log("Reached End of assigned path.");
         OnEndOfThePath?.Invoke(this); 
@@ -92,6 +94,35 @@ public class Person : MonoBehaviour
         }
     }
 
+    public void AdvanceToNextQueueSlot(ConveyorQueueSlot nextSlot)
+    {
+        if (movementCoroutine != null) StopCoroutine(movementCoroutine);
+
+        movementCoroutine = StartCoroutine(MoveDirectlyToSlot(nextSlot));
+    }
+
+    private IEnumerator MoveDirectlyToSlot(ConveyorQueueSlot slot)
+    {
+        Vector3 target = slot.Position;
+
+        while ((transform.position - target).sqrMagnitude > 0.001f)
+        {
+            transform.position = Vector3.MoveTowards(
+                transform.position,
+                target,
+                speed * Time.deltaTime
+            );
+            yield return null;
+        }
+
+        transform.position = target;
+
+        CurrentQueueSlot = slot;
+        AssignedQueueIndex = slot.QueueIndex;
+
+        OnEndOfThePath?.Invoke(this);
+    }
+
     private IEnumerator MoveToWaitingSlot()
     {
         if (assignedWaitingSlot == null) yield break;
@@ -115,7 +146,21 @@ public class Person : MonoBehaviour
     {
         if(assignedWaitingSlot != null) assignedWaitingSlot.Clear();
         if(CurrentQueueSlot != null) CurrentQueueSlot.Clear();
-        Destroy(gameObject);
+        pool.Return(this);
+    }
+
+    public void ResetState()
+    {
+        StopAllCoroutines();
+
+        currentWaypointIndex = 0;
+        maxAllowedWaypointIndex = 0;
+        AssignedQueueIndex = -1;
+
+        assignedQueueSlot = null;
+        assignedWaitingSlot = null;
+
+        personState = PersonStates.OnConveyor;
     }
 }
 
