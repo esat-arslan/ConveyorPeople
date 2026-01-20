@@ -14,7 +14,7 @@ public class PersonSpawnerEditor : Editor
         
         if (GUILayout.Button("Spawn Debug Person", GUILayout.Height(30)))
         {
-            spawner.SpawnPerson();
+            spawner.TrySpawn();
         }
     }
 }

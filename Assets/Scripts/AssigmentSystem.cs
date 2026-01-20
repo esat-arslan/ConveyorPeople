@@ -47,7 +47,7 @@ public class AssignmentSystem : MonoBehaviour
         person.OnEndOfThePath += HandlePersonReachedEnd;
 
         ConveyorQueueSlot queueSlot = GetNextQueueSlot(person);
-        if(queueSlot != null)
+        if (queueSlot != null)
         {
             queueSlot.AssignToQueue(person);
             person.AssignQueueSlot(queueSlot);
@@ -66,7 +66,7 @@ public class AssignmentSystem : MonoBehaviour
 
     private void HandlePersonReachedEnd(Person person)
     {
-        int lastSlotIndex = conveyorQueueSlots.Count -1;
+        int lastSlotIndex = conveyorQueueSlots.Count - 1;
         if (person.AssignedQueueIndex != lastSlotIndex) return;
         WaitingSlot slot = GetNextFreeSlot();
         if (slot == null)
@@ -85,7 +85,7 @@ public class AssignmentSystem : MonoBehaviour
 
     private void AdvanceQueue()
     {
-        for(int i = conveyorQueueSlots.Count -2; i >= 0; i--)
+        for (int i = conveyorQueueSlots.Count - 2; i >= 0; i--)
         {
             ConveyorQueueSlot currentSlot = conveyorQueueSlots[i];
             ConveyorQueueSlot nextSlot = conveyorQueueSlots[i + 1];
@@ -135,5 +135,14 @@ public class AssignmentSystem : MonoBehaviour
             }
         }
         return null;
+    }
+
+    public bool HasFreeQueueSlot()
+    {
+        foreach (var slot in conveyorQueueSlots)
+        {
+            if (!slot.IsOccupied) return true;
+        }
+        return false;
     }
 }

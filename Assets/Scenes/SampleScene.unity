@@ -1106,14 +1106,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PersonSpawner
   conveyorPath: {fileID: 1344250908}
-  personPrefab: {fileID: 2328827632849130236, guid: 17482fbe9c3ed9abcaf004f3ce6611b3, type: 3}
   assigmentSystem: {fileID: 894975505}
-  colorPool:
-  - {r: 1, g: 0, b: 0, a: 1}
-  - {r: 0, g: 0.043819427, b: 1, a: 1}
-  - {r: 0.020123124, g: 1, b: 0, a: 1}
-  - {r: 1, g: 0.4730277, b: 0, a: 1}
   pool: {fileID: 360569005}
+  spawnConfig: {fileID: 11400000, guid: 157dde2cc15a206c8a40cb92d473878c, type: 2}
 --- !u!1 &1412790614
 GameObject:
   m_ObjectHideFlags: 0

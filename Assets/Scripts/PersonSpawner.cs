@@ -1,25 +1,53 @@
+using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PersonSpawner : MonoBehaviour
 {
     [SerializeField] private ConveyorPath conveyorPath;
-    [SerializeField] private Person personPrefab;
     [SerializeField] private AssignmentSystem assigmentSystem;
-    [SerializeField] private List<Color> colorPool = new List<Color>();
     [SerializeField] private PersonPool pool;
+    [SerializeField] private PersonSpawnConfig spawnConfig;
 
-    public void SpawnPerson()
+    private void Awake()
+    {
+        spawnConfig.ResetRuntimeData();
+    }
+
+    private void Start()
+    {
+        StartCoroutine(SpawnRoutine());
+    }
+
+    private IEnumerator SpawnRoutine()
+    {
+        while (true)
+        {
+            TrySpawn();
+            yield return new WaitForSeconds(1f);
+        }
+    }
+
+    public void TrySpawn()
+    {
+        if (!assigmentSystem.HasFreeQueueSlot()) return;
+
+        var rule = spawnConfig.GetNextAvaibleRule();
+        if (rule == null) return;
+
+        SpawnPerson(rule);
+    }
+
+    public void SpawnPerson(PersonSpawnConfig.ColorSpawnRule rule)
     {
         Person person = pool.Get();
         person.transform.position = conveyorPath.StartPosition;
-
-        int randomIndex = Random.Range(0, colorPool.Count);
-        Color randomColor = colorPool[randomIndex];
-        person.gameObject.GetComponent<SpriteRenderer>().color = randomColor;
-
+        person.GetComponent<SpriteRenderer>().color = rule.color;
         person.Initialize(conveyorPath, pool);
         assigmentSystem.RegisterPerson(person);
+        rule.spawnedCount++;
     }
 
 
