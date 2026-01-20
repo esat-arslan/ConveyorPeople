@@ -32,12 +32,14 @@ public class PersonSpawner : MonoBehaviour
 
     public void TrySpawn()
     {
-        if (!assigmentSystem.HasFreeQueueSlot()) return;
-
-        var rule = spawnConfig.GetNextAvaibleRule();
-        if (rule == null) return;
-
-        SpawnPerson(rule);
+        Person person = pool.Get();
+        person.transform.position = conveyorPath.StartPosition;
+        person.Initialize(conveyorPath, pool);
+        if (!assigmentSystem.TryRegisterPerson(person))
+        {
+            pool.Return(person);
+            return;
+        }
     }
 
     public void SpawnPerson(PersonSpawnConfig.ColorSpawnRule rule)
@@ -46,7 +48,7 @@ public class PersonSpawner : MonoBehaviour
         person.transform.position = conveyorPath.StartPosition;
         person.GetComponent<SpriteRenderer>().color = rule.color;
         person.Initialize(conveyorPath, pool);
-        assigmentSystem.RegisterPerson(person);
+        assigmentSystem.TryRegisterPerson(person);
         rule.spawnedCount++;
     }
 

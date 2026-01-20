@@ -38,22 +38,18 @@ public class AssignmentSystem : MonoBehaviour
     }
 
 
-    public void RegisterPerson(Person person)
+    public bool TryRegisterPerson(Person person)
     {
-        if (person is null)
-            return;
+        ConveyorQueueSlot queueSlot = GetNextQueueSlot(person);
+        if (queueSlot == null) return false;
+        if (person == null) return false;
 
         activePeople.Add(person);
         person.OnEndOfThePath += HandlePersonReachedEnd;
 
-        ConveyorQueueSlot queueSlot = GetNextQueueSlot(person);
-        if (queueSlot != null)
-        {
-            queueSlot.AssignToQueue(person);
-            person.AssignQueueSlot(queueSlot);
-            person.StartConveyorMovement(queueSlot.QueueIndex);
-        }
-        Debug.Log("RegisterPerson called");
+        queueSlot.AssignToQueue(person);
+        person.AssignQueueSlot(queueSlot);
+        return true;
     }
 
     public void UnregisterPerson(Person person)
@@ -90,29 +86,14 @@ public class AssignmentSystem : MonoBehaviour
             ConveyorQueueSlot currentSlot = conveyorQueueSlots[i];
             ConveyorQueueSlot nextSlot = conveyorQueueSlots[i + 1];
 
-            if (currentSlot.IsOccupied && !nextSlot.IsOccupied)
-            {
-                Person personToMove = currentSlot.Occupant;
+            if (!currentSlot.IsOccupied || nextSlot.IsOccupied) continue;
 
-                currentSlot.Clear();
-                personToMove.AdvanceToNextQueueSlot(nextSlot);
-                nextSlot.AssignToQueue(personToMove);
-            }
+            Person personToMove = currentSlot.Occupant;
+            if (personToMove.IsOnConveyor) continue;
+            currentSlot.Clear();
+            nextSlot.AssignToQueue(personToMove);
+            personToMove.AdvanceToNextQueueSlot(nextSlot);
         }
-    }
-
-    private void HandlePersonSpawned(Person person)
-    {
-        Debug.Log("HandlePersonSpawned called");
-        ConveyorQueueSlot queueSlot = GetNextQueueSlot(person);
-        if (queueSlot is null)
-        {
-            Debug.Log($"No free queue slots! current occupant");
-            return;
-        }
-
-        queueSlot.AssignToQueue(person);
-        person.AssignQueueSlot(queueSlot);
     }
 
     private WaitingSlot GetNextFreeSlot()
@@ -129,20 +110,9 @@ public class AssignmentSystem : MonoBehaviour
     {
         for (int i = conveyorQueueSlots.Count - 1; i >= 0; i--)
         {
-            if (!conveyorQueueSlots[i].IsOccupied)
-            {
-                return conveyorQueueSlots[i];
-            }
+            if (!conveyorQueueSlots[i].IsOccupied) return conveyorQueueSlots[i];
         }
-        return null;
-    }
 
-    public bool HasFreeQueueSlot()
-    {
-        foreach (var slot in conveyorQueueSlots)
-        {
-            if (!slot.IsOccupied) return true;
-        }
-        return false;
+        return null;
     }
 }

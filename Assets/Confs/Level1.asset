@@ -14,14 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PersonSpawnConfig
   colorRules:
   - color: {r: 1, g: 0.0141509175, b: 0.0141509175, a: 1}
-    totalToSpawn: 5
-    spawnedCount: 0
-  - color: {r: 0, g: 0, b: 0, a: 0}
-    totalToSpawn: 0
-    spawnedCount: 0
-  - color: {r: 0.3480331, g: 0.50945896, b: 0.745283, a: 1}
-    totalToSpawn: 5
-    spawnedCount: 0
-  - color: {r: 0, g: 0, b: 0, a: 1}
-    totalToSpawn: 5
+    totalToSpawn: 3
     spawnedCount: 0
