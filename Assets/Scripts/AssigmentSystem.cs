@@ -63,21 +63,21 @@ public class AssignmentSystem : MonoBehaviour
     private void HandlePersonReachedEnd(Person person)
     {
         int lastSlotIndex = conveyorQueueSlots.Count - 1;
-        if (person.AssignedQueueIndex != lastSlotIndex) return;
-        WaitingSlot slot = GetNextFreeSlot();
-        if (slot == null)
+
+        if (person.AssignedQueueIndex == lastSlotIndex)
         {
-            Debug.LogWarning($"No free waiting slots!");
-            return;
+            WaitingSlot slot = GetNextFreeSlot();
+            if (slot == null)
+                return;
+
+            person.CurrentQueueSlot.Clear();
+            slot.Assign(person);
+            person.AssignWaitingSlot(slot);
         }
 
-        person.CurrentQueueSlot.Clear();
-
-        slot.Assign(person);
-        person.AssignWaitingSlot(slot);
-
-        AdvanceQueue();
+        TryAdvancePerson(person);
     }
+
 
     private void AdvanceQueue()
     {
@@ -93,8 +93,34 @@ public class AssignmentSystem : MonoBehaviour
             currentSlot.Clear();
             nextSlot.AssignToQueue(personToMove);
             personToMove.AdvanceToNextQueueSlot(nextSlot);
+
         }
     }
+
+    public void TryAdvancePerson(Person person)
+    {
+        while (true)
+        {
+            int currentIndex = person.AssignedQueueIndex;
+            int nextIndex = currentIndex + 1;
+
+            if (nextIndex >= conveyorQueueSlots.Count)
+                return;
+
+            ConveyorQueueSlot nextSlot = conveyorQueueSlots[nextIndex];
+
+            if (nextSlot.IsOccupied)
+                return;
+
+            // Move forward one slot
+            ConveyorQueueSlot currentSlot = conveyorQueueSlots[currentIndex];
+
+            currentSlot.Clear();
+            nextSlot.AssignToQueue(person);
+            person.AdvanceToNextQueueSlot(nextSlot);
+        }
+    }
+
 
     private WaitingSlot GetNextFreeSlot()
     {
