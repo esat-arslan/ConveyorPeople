@@ -32,7 +32,7 @@ public class PersonPool : MonoBehaviour
         Person person = pool.Dequeue();
         person.gameObject.SetActive(true);
         person.ResetState();
-        Debug.Log($"GET PERSON ID: {person.GetInstanceID()}");
+        //Debug.Log($"GET PERSON ID: {person.GetInstanceID()}");
 
         return person;
     }
@@ -41,7 +41,6 @@ public class PersonPool : MonoBehaviour
     {
         person.ResetState();
         person.gameObject.SetActive(false);
-        Debug.Log($"RETURN PERSON ID: {person.GetInstanceID()}");
 
         pool.Enqueue(person);
     }

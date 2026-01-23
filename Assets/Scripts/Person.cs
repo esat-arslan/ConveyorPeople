@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Person : MonoBehaviour
@@ -12,6 +13,7 @@ public class Person : MonoBehaviour
     // Logic Variables
     private int currentWaypointIndex;
     private int maxAllowedWaypointIndex;
+    bool hasStartedConveyorMovement;
     private PersonStates personState;
 
     private WaitingSlot assignedWaitingSlot;
@@ -21,8 +23,10 @@ public class Person : MonoBehaviour
     public int AssignedQueueIndex { get; private set; } = -1;
 
     public event Action<Person> OnEndOfThePath;
-    private bool hasStartedConveyorMovement;
     private Coroutine movementCoroutine;
+
+    private ConveyorQueueSlot pendingQueueSlot;
+    private bool isMoving;
 
     public void Initialize(ConveyorPath path, PersonPool personPool)
     {
@@ -71,8 +75,6 @@ public class Person : MonoBehaviour
     {
         if (conveyorPath is null) yield break;
 
-        Debug.Log($"current waypoint index {currentWaypointIndex}, max allowedwaypoint index {maxAllowedWaypointIndex}");
-
         while (currentWaypointIndex <= maxAllowedWaypointIndex)
         {
             Vector3 target = conveyorPath.GetWaypointPos(currentWaypointIndex);
@@ -100,12 +102,25 @@ public class Person : MonoBehaviour
 
     public void AdvanceToNextQueueSlot(ConveyorQueueSlot nextSlot)
     {
-        StopMovement();
-        movementCoroutine = StartCoroutine(MoveDirectlyToSlot(nextSlot));
+        if (isMoving)
+        {
+            pendingQueueSlot = nextSlot;
+            return;
+        }
+        StartMoveToSlot(nextSlot);
     }
+
+    private void StartMoveToSlot(ConveyorQueueSlot slot)
+    {
+        if (movementCoroutine != null) StopCoroutine(movementCoroutine);
+        movementCoroutine = StartCoroutine(MoveDirectlyToSlot(slot));
+    }
+
 
     private IEnumerator MoveDirectlyToSlot(ConveyorQueueSlot slot)
     {
+        isMoving = true;
+
         Vector3 target = slot.Position;
 
         while ((transform.position - target).sqrMagnitude > 0.001f)
@@ -122,6 +137,15 @@ public class Person : MonoBehaviour
 
         CurrentQueueSlot = slot;
         AssignedQueueIndex = slot.QueueIndex;
+
+        isMoving = false;
+
+        if (pendingQueueSlot != null)
+        {
+            ConveyorQueueSlot next = pendingQueueSlot;
+            pendingQueueSlot = null;
+            StartMoveToSlot(next);
+        }
 
     }
 

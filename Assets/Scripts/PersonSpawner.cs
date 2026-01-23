@@ -26,7 +26,7 @@ public class PersonSpawner : MonoBehaviour
         while (true)
         {
             TrySpawn();
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(0.5f);
         }
     }
 

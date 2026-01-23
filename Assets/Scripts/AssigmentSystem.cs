@@ -112,23 +112,25 @@ public class AssignmentSystem : MonoBehaviour
             if (nextSlot.IsOccupied)
                 return;
 
-            // Move forward one slot
             ConveyorQueueSlot currentSlot = conveyorQueueSlots[currentIndex];
 
             currentSlot.Clear();
             nextSlot.AssignToQueue(person);
+            person.AssignQueueSlot(nextSlot);
             person.AdvanceToNextQueueSlot(nextSlot);
+
         }
     }
 
 
     private WaitingSlot GetNextFreeSlot()
     {
+        Debug.Log("Looking for free slot");
         foreach (WaitingSlot slot in waitingSlots)
         {
             if (!slot.IsOccupied) return slot;
         }
-
+        Debug.Log("No free waiting slots");
         return null;
     }
 
@@ -136,7 +138,10 @@ public class AssignmentSystem : MonoBehaviour
     {
         for (int i = conveyorQueueSlots.Count - 1; i >= 0; i--)
         {
-            if (!conveyorQueueSlots[i].IsOccupied) return conveyorQueueSlots[i];
+            bool currentEmpty = !conveyorQueueSlots[i].IsOccupied;
+            bool prevEmpty = (i>0)&&!conveyorQueueSlots[i-1].IsOccupied;
+
+            if(currentEmpty && prevEmpty) return conveyorQueueSlots[i];
         }
 
         return null;

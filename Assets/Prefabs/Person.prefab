@@ -104,4 +104,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abc7b18f4c1452f02ba6271a0ef6a05b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Person
-  speed: 2
+  speed: 3
