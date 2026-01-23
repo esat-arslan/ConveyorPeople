@@ -73,9 +73,12 @@ public class AssignmentSystem : MonoBehaviour
             person.CurrentQueueSlot.Clear();
             slot.Assign(person);
             person.AssignWaitingSlot(slot);
+            AdvanceQueue();
         }
-
-        TryAdvancePerson(person);
+        else
+        {
+            TryAdvancePerson(person);
+        }
     }
 
 
@@ -92,7 +95,7 @@ public class AssignmentSystem : MonoBehaviour
             if (personToMove.IsOnConveyor) continue;
             currentSlot.Clear();
             nextSlot.AssignToQueue(personToMove);
-            personToMove.AdvanceToNextQueueSlot(nextSlot);
+            personToMove.AssignQueueSlot(nextSlot);
 
         }
     }
@@ -117,7 +120,6 @@ public class AssignmentSystem : MonoBehaviour
             currentSlot.Clear();
             nextSlot.AssignToQueue(person);
             person.AssignQueueSlot(nextSlot);
-            person.AdvanceToNextQueueSlot(nextSlot);
 
         }
     }
