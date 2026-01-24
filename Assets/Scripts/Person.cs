@@ -17,6 +17,7 @@ public class Person : MonoBehaviour
     private PersonStates personState;
 
     private WaitingSlot assignedWaitingSlot;
+    public WaitingSlot AssignedWaitingSlot => assignedWaitingSlot;
     private ConveyorQueueSlot assignedQueueSlot;
 
     public ConveyorQueueSlot CurrentQueueSlot { get; private set; }
@@ -174,7 +175,6 @@ public class Person : MonoBehaviour
     {
         if (assignedWaitingSlot != null) assignedWaitingSlot.Clear();
         if (CurrentQueueSlot != null) CurrentQueueSlot.Clear();
-        pool.Return(this);
     }
 
     public void ResetState()
@@ -202,6 +202,21 @@ public class Person : MonoBehaviour
         }
     }
 
+    public void StartMovementToCar(Car car)
+    {
+        StopAllCoroutines();
+        Vector3 carPos = car.transform.position;
+        this.transform.position = carPos;
+    }
+
+    public void LeaveWaitingSlot()
+    {
+        if (assignedWaitingSlot != null)
+        {
+            assignedWaitingSlot.Clear();
+            assignedWaitingSlot = null;
+        }
+    }
 }
 
 public enum PersonStates { OnConveyor, Waiting }

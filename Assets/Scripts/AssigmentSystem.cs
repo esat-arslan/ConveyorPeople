@@ -9,6 +9,7 @@ public class AssignmentSystem : MonoBehaviour
     [SerializeField] private ConveyorQueueSlot conveyorQueueSlot;
     [SerializeField] private ConveyorPath conveyorPath;
     [SerializeField] private Transform queueSlotsParent;
+    private IReadOnlyList<Car> ActiveCars => CarManager.Instance.ActiveCars;
     private readonly List<Person> activePeople = new();
 
 
@@ -41,9 +42,9 @@ public class AssignmentSystem : MonoBehaviour
     public bool TryRegisterPerson(Person person)
     {
         if (conveyorQueueSlots.Count == 0) return false;
-        
+
         ConveyorQueueSlot firstSlot = conveyorQueueSlots[0];
-        
+
         if (firstSlot.IsOccupied || !firstSlot.IsAvaible) return false;
         if (person == null) return false;
 
@@ -84,9 +85,29 @@ public class AssignmentSystem : MonoBehaviour
         }
     }
 
+    public void TryAssignPersonToCar(Person person)
+    {
+        if (CarManager.Instance == null)
+        {
+            Debug.Log("CarManager.Instance is null");
+        }
+        Debug.Log("CarManager.Instance is not null");
+
+        CarManager.Instance.ForDebugging();
+
+        foreach (Car car in ActiveCars)
+        {
+            Debug.Log("Trying to assign");
+            if (!car.CanAccept(person)) continue;
+
+            AssignPersonToCar(person, car);
+            return;
+        }
+    }
+
     private WaitingSlot GetNextFreeSlot()
     {
-        foreach(WaitingSlot slot in waitingSlots)
+        foreach (WaitingSlot slot in waitingSlots)
         {
             if (!slot.IsOccupied) return slot;
         }
@@ -130,5 +151,15 @@ public class AssignmentSystem : MonoBehaviour
         currentSlot.Clear();
         person.AssignQueueSlot(nextSlot);
         AdvanceQueue();
+    }
+
+    public void AssignPersonToCar(Person person, Car car)
+    {
+        if (car.CanAccept(person))
+        {
+            person.LeaveWaitingSlot();
+            person.StartMovementToCar(car);
+            car.AddPersonToCar(person);
+        }
     }
 }
