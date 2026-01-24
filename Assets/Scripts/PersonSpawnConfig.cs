@@ -25,9 +25,28 @@ public class PersonSpawnConfig : ScriptableObject
 
     public ColorSpawnRule GetNextAvaibleRule()
     {
+        int totalRemaining = 0;
         foreach (var rule in colorRules)
         {
-            if (rule.spawnedCount < rule.totalToSpawn) return rule;
+            int remaining = rule.totalToSpawn - rule.spawnedCount;
+            if (remaining > 0) totalRemaining += remaining;
+        }
+
+        if (totalRemaining <= 0) return null;
+
+        int randomPoint = Random.Range(0, totalRemaining);
+
+        foreach (var rule in colorRules)
+        {
+            int remaining = rule.totalToSpawn - rule.spawnedCount;
+            if (remaining > 0)
+            {
+                if (randomPoint < remaining)
+                {
+                    return rule;
+                }
+                randomPoint -= remaining;
+            }
         }
         return null;
     }
