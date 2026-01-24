@@ -89,12 +89,12 @@ public class AssignmentSystem : MonoBehaviour
             ConveyorQueueSlot currentSlot = conveyorQueueSlots[i];
             ConveyorQueueSlot nextSlot = conveyorQueueSlots[i + 1];
 
-            if (!currentSlot.IsOccupied || nextSlot.IsOccupied) continue;
+            if (!currentSlot.IsOccupied || !nextSlot.IsAvaible) continue;
 
             Person personToMove = currentSlot.Occupant;
             if (personToMove.IsOnConveyor) continue;
+            nextSlot.Reserve();
             currentSlot.Clear();
-            nextSlot.AssignToQueue(personToMove);
             personToMove.AssignQueueSlot(nextSlot);
 
         }
@@ -112,13 +112,12 @@ public class AssignmentSystem : MonoBehaviour
 
             ConveyorQueueSlot nextSlot = conveyorQueueSlots[nextIndex];
 
-            if (nextSlot.IsOccupied)
+            if (!nextSlot.IsAvaible)
                 return;
 
             ConveyorQueueSlot currentSlot = conveyorQueueSlots[currentIndex];
-
+            nextSlot.Reserve();
             currentSlot.Clear();
-            nextSlot.AssignToQueue(person);
             person.AssignQueueSlot(nextSlot);
 
         }

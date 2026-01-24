@@ -68,6 +68,7 @@ public class Person : MonoBehaviour
     {
         yield return StartCoroutine(FollowPathRoutine());
         IsOnConveyor = false;
+        if (CurrentQueueSlot != null) CurrentQueueSlot.AssignToQueue(this);
         OnEndOfThePath?.Invoke(this);
     }
 
@@ -137,6 +138,7 @@ public class Person : MonoBehaviour
 
         CurrentQueueSlot = slot;
         AssignedQueueIndex = slot.QueueIndex;
+        slot.AssignToQueue(this);
 
         isMoving = false;
 
