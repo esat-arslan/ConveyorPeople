@@ -44,8 +44,8 @@ public class PersonSpawner : MonoBehaviour
     {
         Person person = pool.Get();
         person.transform.position = conveyorPath.StartPosition;
-        person.GetComponent<SpriteRenderer>().color = rule.color;
-        person.Initialize(conveyorPath, pool);
+        person.Initialize(conveyorPath, pool, rule.carType);
+        person.SetVisual(rule.color);
         
         if (assigmentSystem.TryRegisterPerson(person))
         {

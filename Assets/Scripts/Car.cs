@@ -14,7 +14,6 @@ public class Car : MonoBehaviour
 
     private void Awake()
     {
-        isActive = true; // For debugging
         if (isActive) CarManager.Instance.Register(this);
     }
 

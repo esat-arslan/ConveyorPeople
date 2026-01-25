@@ -7,6 +7,7 @@ public class PersonSpawnConfig : ScriptableObject
     [System.Serializable]
     public class ColorSpawnRule
     {
+        public CarType carType;
         public Color color;
         public int totalToSpawn;
         [HideInInspector] public int spawnedCount;

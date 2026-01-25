@@ -6,6 +6,7 @@ using UnityEngine;
 public class Person : MonoBehaviour
 {
     [SerializeField] private float speed = 5f;
+    [SerializeField] CarType personType;
     private ConveyorPath conveyorPath;
     private PersonPool pool;
     public bool IsOnConveyor { get; private set; }
@@ -29,8 +30,9 @@ public class Person : MonoBehaviour
     private ConveyorQueueSlot pendingQueueSlot;
     private bool isMoving;
 
-    public void Initialize(ConveyorPath path, PersonPool personPool)
+    public void Initialize(ConveyorPath path, PersonPool personPool, CarType carType)
     {
+        personType = carType;
         conveyorPath = path;
         pool = personPool;
         ResetState();
@@ -216,6 +218,11 @@ public class Person : MonoBehaviour
             assignedWaitingSlot.Clear();
             assignedWaitingSlot = null;
         }
+    }
+
+    public void SetVisual(Color color)
+    {
+        GetComponent<SpriteRenderer>().color = color;
     }
 }
 
