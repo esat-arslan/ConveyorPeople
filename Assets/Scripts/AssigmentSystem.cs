@@ -11,6 +11,7 @@ public class AssignmentSystem : MonoBehaviour
     [SerializeField] private Transform queueSlotsParent;
     private IReadOnlyList<Car> ActiveCars => CarManager.Instance.ActiveCars;
     private readonly List<Person> activePeople = new();
+    private readonly List<Person> waitingPeople = new();
 
 
     private void Awake()
@@ -22,8 +23,40 @@ public class AssignmentSystem : MonoBehaviour
 
         foreach (WaitingSlot slot in waitingSlots)
         {
-            slot.Clear();
+            
         }
+    }
+
+    private void OnEnable()
+    {
+        Car.OnCarActivated += HandleCarActivated;
+    }
+    private void OnDisable()
+    {
+        Car.OnCarActivated -= HandleCarActivated;
+    }
+
+    private void HandleCarActivated(Car car)
+    {
+        TryAssignWaitingPeople();
+    }
+
+    private void TryAssignWaitingPeople()
+    {
+        foreach (Person person in waitingPeople)
+        {
+            if (person == null) continue;
+            Debug.Log("Assiging waiting people");
+            TryAssignPersonToCar(person); //HandleWaitingSlotEmptied();
+            
+        }
+    }
+
+    private bool isQueueEmpty()
+    {
+        ConveyorQueueSlot queueSlot = conveyorQueueSlots[conveyorQueueSlots.Count - 1];
+        if (queueSlot.IsOccupied) return false;
+        return true;
     }
 
     private void CreateQueueSlot(Transform queuePos)
@@ -50,6 +83,7 @@ public class AssignmentSystem : MonoBehaviour
 
         activePeople.Add(person);
         person.OnEndOfThePath += HandlePersonReachedEnd;
+        person.OnEnteredWaiting += HandlePersonEnteredWaiting;
 
         firstSlot.AssignToQueue(person);
         person.AssignQueueSlot(firstSlot);
@@ -85,24 +119,26 @@ public class AssignmentSystem : MonoBehaviour
         }
     }
 
-    public void TryAssignPersonToCar(Person person)
+    public bool TryAssignPersonToCar(Person person)
     {
         if (CarManager.Instance == null)
         {
             Debug.Log("CarManager.Instance is null");
+            return false;
         }
-        Debug.Log("CarManager.Instance is not null");
-
         CarManager.Instance.ForDebugging();
 
         foreach (Car car in ActiveCars)
         {
             Debug.Log("Trying to assign");
             if (!car.CanAccept(person)) continue;
-
-            AssignPersonToCar(person, car);
-            return;
+            if (car.CarType == person.PersonType)
+            {
+                AssignPersonToCar(person, car);
+                return true;
+            }
         }
+        return false;
     }
 
     private WaitingSlot GetNextFreeSlot()
@@ -161,5 +197,18 @@ public class AssignmentSystem : MonoBehaviour
             person.StartMovementToCar(car);
             car.AddPersonToCar(person);
         }
+    }
+
+    private void HandlePersonEnteredWaiting(Person person)
+    {
+        if (!waitingPeople.Contains(person)) waitingPeople.Add(person);
+
+        TryAssignPersonToCar(person);
+    }
+
+    private void HandleWaitingSlotEmptied()
+    {
+        AdvanceQueue();
+        TryAssignWaitingPeople();
     }
 }

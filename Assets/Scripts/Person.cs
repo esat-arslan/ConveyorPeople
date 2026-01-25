@@ -7,6 +7,7 @@ public class Person : MonoBehaviour
 {
     [SerializeField] private float speed = 5f;
     [SerializeField] CarType personType;
+    public CarType PersonType => personType;
     private ConveyorPath conveyorPath;
     private PersonPool pool;
     public bool IsOnConveyor { get; private set; }
@@ -25,6 +26,7 @@ public class Person : MonoBehaviour
     public int AssignedQueueIndex { get; private set; } = -1;
 
     public event Action<Person> OnEndOfThePath;
+    public event Action<Person> OnEnteredWaiting;
     private Coroutine movementCoroutine;
 
     private ConveyorQueueSlot pendingQueueSlot;
@@ -56,6 +58,7 @@ public class Person : MonoBehaviour
         personState = PersonStates.Waiting;
 
         movementCoroutine = StartCoroutine(MoveToWaitingSlot());
+        OnEnteredWaiting?.Invoke(this);
     }
 
     public void StartConveyorMovement(int targetQueueIndex)
@@ -207,8 +210,25 @@ public class Person : MonoBehaviour
     public void StartMovementToCar(Car car)
     {
         StopAllCoroutines();
-        Vector3 carPos = car.transform.position;
-        this.transform.position = carPos;
+        movementCoroutine = StartCoroutine(MoveToCarRoutine(car));
+    }
+
+    private IEnumerator MoveToCarRoutine(Car car)
+    {
+        Vector3 target = car.transform.position;
+
+        while ((transform.position - target).sqrMagnitude > 0.001f)
+        {
+            transform.position = Vector3.MoveTowards(
+                transform.position,
+                target,
+                speed * Time.deltaTime
+            );
+            yield return null;
+        }
+
+        transform.position = target;
+
     }
 
     public void LeaveWaitingSlot()

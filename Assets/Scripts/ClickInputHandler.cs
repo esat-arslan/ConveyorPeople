@@ -28,6 +28,6 @@ public class ClickInputHandler : MonoBehaviour
         }
         Debug.Log("Car clicked!");
         car.SetActive(true);
-        Debug.Log($"Clicked on the car {car.gameObject.GetInstanceID()}");
+        Debug.Log($"car activated: {car.IsActive}");
     }
 }

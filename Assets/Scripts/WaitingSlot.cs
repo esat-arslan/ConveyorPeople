@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class WaitingSlot : MonoBehaviour
@@ -6,6 +7,7 @@ public class WaitingSlot : MonoBehaviour
     public Person Occupant { get; private set; }
 
     public Vector3 Position => transform.position;
+
 
     public void Assign(Person person)
     {

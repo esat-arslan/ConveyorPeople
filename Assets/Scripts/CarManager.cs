@@ -25,7 +25,7 @@ public class CarManager : MonoBehaviour
 
     public void Unregister(Car car)
     {
-        if(activeCars.Contains(car)) activeCars.Remove(car);
+        if (activeCars.Contains(car)) activeCars.Remove(car);
     }
 
     public void ForDebugging()
