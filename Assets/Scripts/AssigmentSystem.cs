@@ -43,12 +43,12 @@ public class AssignmentSystem : MonoBehaviour
 
     private void TryAssignWaitingPeople()
     {
-        foreach (Person person in waitingPeople)
+        for (int i = waitingPeople.Count - 1; i >= 0; i--)
         {
+            Person person = waitingPeople[i];
             if (person == null) continue;
             Debug.Log("Assiging waiting people");
-            TryAssignPersonToCar(person); //HandleWaitingSlotEmptied();
-            
+            TryAssignPersonToCar(person); 
         }
     }
 
@@ -104,19 +104,32 @@ public class AssignmentSystem : MonoBehaviour
 
         if (person.AssignedQueueIndex == lastSlotIndex)
         {
-            WaitingSlot slot = GetNextFreeSlot();
-            if (slot == null)
-                return;
-
-            person.CurrentQueueSlot.Clear();
-            slot.Assign(person);
-            person.AssignWaitingSlot(slot);
-            AdvanceQueue();
+            TryMoveEndQueueToWaiting();
         }
         else
         {
             TryAdvancePerson(person);
         }
+    }
+
+    private void TryMoveEndQueueToWaiting()
+    {
+        int lastSlotIndex = conveyorQueueSlots.Count - 1;
+        if (lastSlotIndex < 0) return;
+
+        ConveyorQueueSlot lastSlot = conveyorQueueSlots[lastSlotIndex];
+        if (!lastSlot.IsOccupied) return;
+
+        Person person = lastSlot.Occupant;
+        if (person.IsOnConveyor) return;
+
+        WaitingSlot slot = GetNextFreeSlot();
+        if (slot == null) return;
+
+        person.CurrentQueueSlot.Clear();
+        slot.Assign(person);
+        person.AssignWaitingSlot(slot);
+        AdvanceQueue();
     }
 
     public bool TryAssignPersonToCar(Person person)
@@ -193,9 +206,12 @@ public class AssignmentSystem : MonoBehaviour
     {
         if (car.CanAccept(person))
         {
+            if (waitingPeople.Contains(person)) waitingPeople.Remove(person);
+
             person.LeaveWaitingSlot();
             person.StartMovementToCar(car);
             car.AddPersonToCar(person);
+            TryMoveEndQueueToWaiting();
         }
     }
 
@@ -204,11 +220,5 @@ public class AssignmentSystem : MonoBehaviour
         if (!waitingPeople.Contains(person)) waitingPeople.Add(person);
 
         TryAssignPersonToCar(person);
-    }
-
-    private void HandleWaitingSlotEmptied()
-    {
-        AdvanceQueue();
-        TryAssignWaitingPeople();
     }
 }
