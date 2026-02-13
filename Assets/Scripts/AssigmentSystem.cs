@@ -9,6 +9,9 @@ public class AssignmentSystem : MonoBehaviour
     [SerializeField] private ConveyorQueueSlot conveyorQueueSlot;
     [SerializeField] private ConveyorPath conveyorPath;
     [SerializeField] private Transform queueSlotsParent;
+    [SerializeField] private PickUpZoneSlot pickUpZoneSlot;
+    [SerializeField] private List<Transform> pickupZones;
+    private List<PickUpZoneSlot> pickUpZoneSlots = new();
     private IReadOnlyList<Car> ActiveCars => CarManager.Instance.ActiveCars;
     private readonly List<Person> activePeople = new();
     private readonly List<Person> waitingPeople = new();
@@ -25,6 +28,11 @@ public class AssignmentSystem : MonoBehaviour
         {
             
         }
+
+        foreach(Transform pos in pickupZones)
+        {
+            CreatePickUpZoneSlot(pos);
+        }
     }
 
     private void OnEnable()
@@ -38,7 +46,21 @@ public class AssignmentSystem : MonoBehaviour
 
     private void HandleCarActivated(Car car)
     {
+        TryMoveCarToPickUpZone(car);
         TryAssignWaitingPeople();
+    }
+
+    private void TryMoveCarToPickUpZone(Car car)
+    {
+        foreach(PickUpZoneSlot pickUp in pickUpZoneSlots)
+        {
+            if (!pickUp.IsOccupied)
+            {
+                car.transform.position = pickUp.Position;
+                pickUp.AssignToCar(car);
+                break;
+            }
+        }
     }
 
     private void TryAssignWaitingPeople()
@@ -69,6 +91,16 @@ public class AssignmentSystem : MonoBehaviour
         conveyorQueueSlots.Add(queueSlot);
         int index = conveyorQueueSlots.IndexOf(queueSlot);
         queueSlot.SetQueueIndex(index);
+    }
+
+    private void CreatePickUpZoneSlot(Transform pickUpZone)
+    {
+        PickUpZoneSlot pickUp = Instantiate(
+            pickUpZoneSlot,
+            pickUpZone.position,
+            Quaternion.identity
+        );
+        pickUpZoneSlots.Add(pickUp);
     }
 
 
@@ -209,7 +241,8 @@ public class AssignmentSystem : MonoBehaviour
             if (waitingPeople.Contains(person)) waitingPeople.Remove(person);
 
             person.LeaveWaitingSlot();
-            person.StartMovementToCar(car);
+            CarPersonSlot freeSlot = car.GetFreeSeat();
+            person.StartMovementToCar(freeSlot);
             car.AddPersonToCar(person);
             TryMoveEndQueueToWaiting();
         }

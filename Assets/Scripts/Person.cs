@@ -207,15 +207,15 @@ public class Person : MonoBehaviour
         }
     }
 
-    public void StartMovementToCar(Car car)
+    public void StartMovementToCar(CarPersonSlot seatSlot)
     {
         StopAllCoroutines();
-        movementCoroutine = StartCoroutine(MoveToCarRoutine(car));
+        movementCoroutine = StartCoroutine(MoveToCarRoutine(seatSlot));
     }
 
-    private IEnumerator MoveToCarRoutine(Car car)
+    private IEnumerator MoveToCarRoutine(CarPersonSlot seatSlot)
     {
-        Vector3 target = car.transform.position;
+        Vector3 target = seatSlot.Position;
 
         while ((transform.position - target).sqrMagnitude > 0.001f)
         {

@@ -13,6 +13,7 @@ public class Car : MonoBehaviour
     public bool IsActive => isActive;
     private List<Person> people = new();
     private List<Person> People => people;
+    private List<CarPersonSlot> seatSlots = new();
 
     public static event Action<Car> OnCarActivated;
     public static event Action<Car> OnCarDeactivated;
@@ -20,6 +21,7 @@ public class Car : MonoBehaviour
     private void Awake()
     {
         if (isActive) CarManager.Instance.Register(this);
+        seatSlots.AddRange(GetComponentsInChildren<CarPersonSlot>());
     }
 
     private void Start()
@@ -47,11 +49,26 @@ public class Car : MonoBehaviour
 
     public bool CanAccept(Person person)
     {
-        return people.Count < Size;
+        foreach(var seat in seatSlots)
+        {
+            if (!seat.IsOccupied) return true;
+        }
+        return false;
+    }
+
+    public CarPersonSlot GetFreeSeat()
+    {
+        foreach(var seat in seatSlots)
+        {
+            if(!seat.IsOccupied) return seat;
+        }
+        return null;
     }
 
     public void AddPersonToCar(Person person)
     {
+        CarPersonSlot freeSlot = GetFreeSeat();
+        freeSlot.AssignToSlot(person);
         people.Add(person);
     }
 
