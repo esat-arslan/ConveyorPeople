@@ -15,4 +15,5 @@ public class PickUpZoneSlot : MonoBehaviour
     {
         Occupant = null;
     }
+    
 }

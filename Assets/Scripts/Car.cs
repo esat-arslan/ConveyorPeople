@@ -17,11 +17,14 @@ public class Car : MonoBehaviour
     private List<Person> people = new();
     private List<Person> People => people;
     private List<CarPersonSlot> seatSlots = new();
+    private PickUpZoneSlot currentPickupSlot;
+    public PickUpZoneSlot CurrentPickupSlot => currentPickupSlot;
     private Coroutine moveRoutine;
 
     public static event Action<Car> OnCarActivated;
     public static event Action<Car> OnCarDeactivated;
     public static event Action<Car> OnCarFull;
+    public static event Action<Car> OnCarExitStarted;
 
     private void Awake()
     {
@@ -102,12 +105,12 @@ public class Car : MonoBehaviour
     private void HandleCarFull(Car car)
     {
         if (car != this) return;
-
         StartExitMovement();
     }
 
     private void StartExitMovement()
     {
+        OnCarExitStarted?.Invoke(this);
         if (moveRoutine != null) StopCoroutine(moveRoutine);
 
         moveRoutine = StartCoroutine(MoveToExitRoutine());
@@ -138,6 +141,11 @@ public class Car : MonoBehaviour
 
         // TODO
         // implement return to pool when object pool gets implemented.
+    }
+
+    internal void SetPickupSlot(PickUpZoneSlot pickUp)
+    {
+        currentPickupSlot = pickUp;
     }
 }
 

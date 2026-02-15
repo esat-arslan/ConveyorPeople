@@ -53,7 +53,9 @@ public class Person : MonoBehaviour
 
     public void AssignWaitingSlot(WaitingSlot slot)
     {
+        if (isMoving) return;
         StopMovement();
+        isMoving = true;
         assignedWaitingSlot = slot;
         personState = PersonStates.Waiting;
 
@@ -106,16 +108,6 @@ public class Person : MonoBehaviour
         }
     }
 
-    public void AdvanceToNextQueueSlot(ConveyorQueueSlot nextSlot)
-    {
-        if (isMoving)
-        {
-            pendingQueueSlot = nextSlot;
-            return;
-        }
-        StartMoveToSlot(nextSlot);
-    }
-
     private void StartMoveToSlot(ConveyorQueueSlot slot)
     {
         if (movementCoroutine != null) StopCoroutine(movementCoroutine);
@@ -158,7 +150,11 @@ public class Person : MonoBehaviour
 
     private IEnumerator MoveToWaitingSlot()
     {
-        if (assignedWaitingSlot == null) yield break;
+        if (assignedWaitingSlot == null)
+        {
+            isMoving = false;
+            yield break;
+        }
 
         Vector3 target = assignedWaitingSlot.Position;
 
@@ -172,15 +168,9 @@ public class Person : MonoBehaviour
             yield return null;
         }
         transform.position = target;
+        isMoving = false;
 
         OnEnteredWaiting?.Invoke(this);
-    }
-
-    // Cleanup
-    public void PickUp()
-    {
-        if (assignedWaitingSlot != null) assignedWaitingSlot.Clear();
-        if (CurrentQueueSlot != null) CurrentQueueSlot.Clear();
     }
 
     public void ResetState()

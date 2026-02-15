@@ -3,21 +3,31 @@ using UnityEngine;
 
 public class WaitingSlot : MonoBehaviour
 {
-    public bool IsOccupied { get; private set; }
+    private bool isReserved;
+
     public Person Occupant { get; private set; }
+    public bool IsOccupied => Occupant != null;
+
+    public bool IsReserved => isReserved;
+    public bool IsAvailable => !IsOccupied && !IsReserved;
 
     public Vector3 Position => transform.position;
 
 
     public void Assign(Person person)
     {
-        IsOccupied = true;
         Occupant = person;
+        isReserved = false;
+    }
+
+    public void Reserve()
+    {
+        isReserved = true;
     }
 
     public void Clear()
     {
-        IsOccupied = false;
         Occupant = null;
+        isReserved = false;
     }
 }
