@@ -15,7 +15,7 @@ public class PersonSpawnConfig : ScriptableObject
 
     public List<ColorSpawnRule> colorRules = new();
     
-    public bool SpawnRemaningAvaible()
+    public bool SpawnRemaningAvailable()
     {
         foreach (var rule in colorRules)
         {
@@ -24,7 +24,7 @@ public class PersonSpawnConfig : ScriptableObject
         return false;
     }
 
-    public ColorSpawnRule GetNextAvaibleRule()
+    public ColorSpawnRule GetNextAvailableRule()
     {
         int totalRemaining = 0;
         foreach (var rule in colorRules)

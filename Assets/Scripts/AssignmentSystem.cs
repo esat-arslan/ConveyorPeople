@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class AssignmentSystem : MonoBehaviour
@@ -27,7 +28,7 @@ public class AssignmentSystem : MonoBehaviour
 
         foreach (WaitingSlot slot in waitingSlots)
         {
-
+            slot.OnSlotFreed += HandleWaitingSlotFreed;
         }
 
         foreach (Transform pos in pickupZones)
@@ -45,6 +46,10 @@ public class AssignmentSystem : MonoBehaviour
     {
         Car.OnCarActivated -= HandleCarActivated;
         Car.OnCarExitStarted -= HandleCarLeavingPickup;
+        foreach (WaitingSlot slot in waitingSlots)
+        {
+            slot.OnSlotFreed -= HandleWaitingSlotFreed;
+        }
     }
 
     private void HandleCarLeavingPickup(Car car)
@@ -120,7 +125,7 @@ public class AssignmentSystem : MonoBehaviour
 
         ConveyorQueueSlot firstSlot = conveyorQueueSlots[0];
 
-        if (firstSlot.IsOccupied || !firstSlot.IsAvaible) return false;
+        if (firstSlot.IsOccupied || !firstSlot.IsAvailable) return false;
         if (person == null) return false;
 
         activePeople.Add(person);
@@ -137,7 +142,7 @@ public class AssignmentSystem : MonoBehaviour
         if (person is null) return;
 
         person.OnEndOfThePath -= HandlePersonReachedEnd;
-        person.OnEnteredWaiting -= HandlePersonReachedEnd;
+        person.OnEnteredWaiting -= HandlePersonEnteredWaiting;
         activePeople.Remove(person);
     }
 
@@ -159,6 +164,7 @@ public class AssignmentSystem : MonoBehaviour
     {
         if (person == null) return;
         if (person.IsOnConveyor) return;
+        if (person.AssignedWaitingSlot != null) return;
 
         if (person.AssignedQueueIndex != conveyorQueueSlots.Count - 1) return;
 
@@ -220,7 +226,7 @@ public class AssignmentSystem : MonoBehaviour
             ConveyorQueueSlot currentSlot = conveyorQueueSlots[i];
             ConveyorQueueSlot nextSlot = conveyorQueueSlots[i + 1];
 
-            if (!currentSlot.IsOccupied || !nextSlot.IsAvaible) continue;
+            if (!currentSlot.IsOccupied || !nextSlot.IsAvailable) continue;
 
             Person personToMove = currentSlot.Occupant;
             if (personToMove.IsOnConveyor) continue;
@@ -242,7 +248,7 @@ public class AssignmentSystem : MonoBehaviour
 
         ConveyorQueueSlot nextSlot = conveyorQueueSlots[nextIndex];
 
-        if (!nextSlot.IsAvaible)
+        if (!nextSlot.IsAvailable)
             return;
 
         ConveyorQueueSlot currentSlot = conveyorQueueSlots[currentIndex];
@@ -266,19 +272,6 @@ public class AssignmentSystem : MonoBehaviour
             {
                 car.AddPersonToCar(person);
             });
-            TryMoveLastQueuePersonToWaiting();
-        }
-    }
-
-    private void TryMoveLastQueuePersonToWaiting()
-    {
-        int lastIndex = conveyorQueueSlots.Count - 1;
-        ConveyorQueueSlot lastSlot = conveyorQueueSlots[lastIndex];
-
-        if (lastSlot.IsOccupied)
-        {
-            Person person = lastSlot.Occupant;
-            TryMoveEndQueueToWaiting(person);
         }
     }
 
@@ -287,5 +280,21 @@ public class AssignmentSystem : MonoBehaviour
         if (!waitingPeople.Contains(person)) waitingPeople.Add(person);
 
         TryAssignPersonToCar(person);
+    }
+
+    private void HandleWaitingSlotFreed(WaitingSlot slot)
+    {
+        TryMoveLastQueuePersonToWaiting();
+    }
+
+    private void TryMoveLastQueuePersonToWaiting()
+    {
+        int lastIndex = conveyorQueueSlots.Count - 1;
+        ConveyorQueueSlot lastSlot = conveyorQueueSlots[lastIndex];
+
+        if (!lastSlot.IsOccupied) return;
+
+        Person person = lastSlot.Occupant;
+        TryMoveEndQueueToWaiting(person);
     }
 }

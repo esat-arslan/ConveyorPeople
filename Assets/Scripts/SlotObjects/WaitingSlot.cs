@@ -13,6 +13,8 @@ public class WaitingSlot : MonoBehaviour
 
     public Vector3 Position => transform.position;
 
+    public event Action<WaitingSlot> OnSlotFreed;
+
 
     public void Assign(Person person)
     {
@@ -29,5 +31,7 @@ public class WaitingSlot : MonoBehaviour
     {
         Occupant = null;
         isReserved = false;
+
+        OnSlotFreed?.Invoke(this);
     }
 }

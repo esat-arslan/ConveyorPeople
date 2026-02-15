@@ -7,7 +7,7 @@ using UnityEngine;
 public class PersonSpawner : MonoBehaviour
 {
     [SerializeField] private ConveyorPath conveyorPath;
-    [SerializeField] private AssignmentSystem assigmentSystem;
+    [SerializeField] private AssignmentSystem assignmentSystem;
     [SerializeField] private PersonPool pool;
     [SerializeField] private PersonSpawnConfig spawnConfig;
 
@@ -34,7 +34,7 @@ public class PersonSpawner : MonoBehaviour
     {
         if (spawnConfig == null) return;
         
-        var rule = spawnConfig.GetNextAvaibleRule();
+        var rule = spawnConfig.GetNextAvailableRule();
         if (rule == null) return;
 
         SpawnPerson(rule);
@@ -47,7 +47,7 @@ public class PersonSpawner : MonoBehaviour
         person.Initialize(conveyorPath, pool, rule.carType);
         person.SetVisual(rule.color);
         
-        if (assigmentSystem.TryRegisterPerson(person))
+        if (assignmentSystem.TryRegisterPerson(person))
         {
             rule.spawnedCount++;
         }

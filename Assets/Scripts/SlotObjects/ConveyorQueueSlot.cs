@@ -9,7 +9,7 @@ public class ConveyorQueueSlot : MonoBehaviour
     public Vector3 Position => transform.position;
     public bool IsReserved {get;private set;}
     public bool IsOccupied => Occupant != null;
-    public bool IsAvaible => !IsOccupied && !IsReserved;
+    public bool IsAvailable => !IsOccupied && !IsReserved;
 
     public void AssignToQueue(Person person)
     {
