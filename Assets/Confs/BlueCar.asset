@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Car_SO
   type: 1
   color: {r: 0.041651815, g: 0.16212818, b: 0.9811321, a: 0}
-  size: 5
+  size: 4

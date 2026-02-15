@@ -58,7 +58,6 @@ public class Person : MonoBehaviour
         personState = PersonStates.Waiting;
 
         movementCoroutine = StartCoroutine(MoveToWaitingSlot());
-        OnEnteredWaiting?.Invoke(this);
     }
 
     public void StartConveyorMovement(int targetQueueIndex)
@@ -173,6 +172,8 @@ public class Person : MonoBehaviour
             yield return null;
         }
         transform.position = target;
+
+        OnEnteredWaiting?.Invoke(this);
     }
 
     // Cleanup
@@ -198,7 +199,7 @@ public class Person : MonoBehaviour
 
     }
 
-    private void StopMovement()
+    public void StopMovement()
     {
         if (movementCoroutine != null)
         {
@@ -207,13 +208,13 @@ public class Person : MonoBehaviour
         }
     }
 
-    public void StartMovementToCar(CarPersonSlot seatSlot)
+    public void StartMovementToCar(CarPersonSlot seatSlot, Action onReached)
     {
-        StopAllCoroutines();
-        movementCoroutine = StartCoroutine(MoveToCarRoutine(seatSlot));
+        StopMovement();
+        movementCoroutine = StartCoroutine(MoveToCarRoutine(seatSlot, onReached));
     }
 
-    private IEnumerator MoveToCarRoutine(CarPersonSlot seatSlot)
+    private IEnumerator MoveToCarRoutine(CarPersonSlot seatSlot, Action onReached)
     {
         Vector3 target = seatSlot.Position;
 
@@ -228,6 +229,10 @@ public class Person : MonoBehaviour
         }
 
         transform.position = target;
+
+        seatSlot.AssignToSlot(this);
+        yield return null;
+        onReached?.Invoke();
 
     }
 

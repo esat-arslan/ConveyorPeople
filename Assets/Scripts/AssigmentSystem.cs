@@ -242,8 +242,11 @@ public class AssignmentSystem : MonoBehaviour
 
             person.LeaveWaitingSlot();
             CarPersonSlot freeSlot = car.GetFreeSeat();
-            person.StartMovementToCar(freeSlot);
-            car.AddPersonToCar(person);
+            freeSlot.Reserve();
+            person.StartMovementToCar(freeSlot, ()=>
+            {
+                car.AddPersonToCar(person);
+            });
             TryMoveEndQueueToWaiting();
         }
     }
