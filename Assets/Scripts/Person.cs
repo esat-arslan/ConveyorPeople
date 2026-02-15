@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class Person : MonoBehaviour
 {
+    private static int globalIdCounter = 0;
+    public int Id {get;private set;}
     [SerializeField] private float speed = 5f;
     [SerializeField] CarType personType;
     public CarType PersonType => personType;
@@ -34,6 +36,8 @@ public class Person : MonoBehaviour
 
     public void Initialize(ConveyorPath path, PersonPool personPool, CarType carType)
     {
+        Id = globalIdCounter++;
+        gameObject.name = $"Person_{Id}";
         personType = carType;
         conveyorPath = path;
         pool = personPool;
@@ -53,12 +57,10 @@ public class Person : MonoBehaviour
 
     public void AssignWaitingSlot(WaitingSlot slot)
     {
-        if (isMoving) return;
-        StopMovement();
-        isMoving = true;
         assignedWaitingSlot = slot;
         personState = PersonStates.Waiting;
 
+        StopMovement();
         movementCoroutine = StartCoroutine(MoveToWaitingSlot());
     }
 

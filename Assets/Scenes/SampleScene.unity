@@ -124,6 +124,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8580759977925447947, guid: f92b4436eb21cb1998d27b799b153b6b, type: 3}
   m_PrefabInstance: {fileID: 3068147584297373379}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &178041984 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1926696143729086789, guid: f92b4436eb21cb1998d27b799b153b6b, type: 3}
+  m_PrefabInstance: {fileID: 3068147584297373379}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c662b30c6278e2820baed450215433f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PickUpZoneSlot
 --- !u!1 &209015759
 GameObject:
   m_ObjectHideFlags: 0
@@ -965,7 +976,7 @@ MonoBehaviour:
   conveyorQueueSlot: {fileID: 8309709274740108447, guid: 60152d63c99cc0c8ab25d83ca6c4e32d, type: 3}
   conveyorPath: {fileID: 1344250908}
   queueSlotsParent: {fileID: 1276440365}
-  pickUpZoneSlot: {fileID: 1926696143729086789, guid: f92b4436eb21cb1998d27b799b153b6b, type: 3}
+  pickUpZoneSlot: {fileID: 178041984}
   pickupZones:
   - {fileID: 178041983}
   - {fileID: 1555019592}
@@ -1613,7 +1624,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PersonSpawner
   conveyorPath: {fileID: 1344250908}
-  assigmentSystem: {fileID: 894975505}
+  assignmentSystem: {fileID: 894975505}
   pool: {fileID: 360569005}
   spawnConfig: {fileID: 11400000, guid: 157dde2cc15a206c8a40cb92d473878c, type: 2}
 --- !u!1 &1412790614
@@ -2245,6 +2256,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1242546644}
     m_Modifications:
+    - target: {fileID: 5996319926525573618, guid: 7a52a1deb93613c73ab1d46ccb7bebfe, type: 3}
+      propertyPath: exitTarget
+      value: 
+      objectReference: {fileID: 2122102483}
     - target: {fileID: 6691295279132558705, guid: 7a52a1deb93613c73ab1d46ccb7bebfe, type: 3}
       propertyPath: m_Name
       value: RedCar (1)

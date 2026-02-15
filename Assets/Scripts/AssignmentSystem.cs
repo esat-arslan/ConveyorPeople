@@ -91,7 +91,6 @@ public class AssignmentSystem : MonoBehaviour
         {
             Person person = waitingPeople[i];
             if (person == null) continue;
-            Debug.Log("Assiging waiting people");
             TryAssignPersonToCar(person);
         }
     }
@@ -188,11 +187,9 @@ public class AssignmentSystem : MonoBehaviour
             Debug.Log("CarManager.Instance is null");
             return false;
         }
-        CarManager.Instance.ForDebugging();
 
         foreach (Car car in ActiveCars)
         {
-            Debug.Log("Trying to assign");
             if (!car.CanAccept(person)) continue;
             if (car.CarType == person.PersonType)
             {
@@ -207,6 +204,8 @@ public class AssignmentSystem : MonoBehaviour
     {
         foreach (WaitingSlot slot in waitingSlots)
         {
+            Debug.Log($"Checking slot {slot.name} | IsOccupied: {slot.IsOccupied} | IsReserved: {slot.IsReserved} | IsAvailable: {slot.IsAvailable}");
+
             if (slot.IsAvailable)
             {
                 slot.Reserve();
@@ -260,19 +259,19 @@ public class AssignmentSystem : MonoBehaviour
 
     public void AssignPersonToCar(Person person, Car car)
     {
-        if (car.CanAccept(person))
-        {
-            if (waitingPeople.Contains(person)) waitingPeople.Remove(person);
+        if (!car.CanAccept(person)) return;
+        CarPersonSlot freeSlot = car.GetFreeSeat();
+        if (freeSlot is null) return;
+        freeSlot.Reserve();
 
-            person.LeaveWaitingSlot();
-            CarPersonSlot freeSlot = car.GetFreeSeat();
-            if (freeSlot is null) return;
-            freeSlot.Reserve();
-            person.StartMovementToCar(freeSlot, () =>
-            {
-                car.AddPersonToCar(person);
-            });
-        }
+        if (waitingPeople.Contains(person)) waitingPeople.Remove(person);
+
+        person.LeaveWaitingSlot();
+        person.StartMovementToCar(freeSlot, () =>
+        {
+            car.AddPersonToCar(person);
+        });
+
     }
 
     private void HandlePersonEnteredWaiting(Person person)

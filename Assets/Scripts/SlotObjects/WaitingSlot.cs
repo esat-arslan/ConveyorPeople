@@ -18,6 +18,8 @@ public class WaitingSlot : MonoBehaviour
 
     public void Assign(Person person)
     {
+        Debug.Log($"Assigning {person.name} to slot {name} at frame {Time.frameCount}");
+
         Occupant = person;
         isReserved = false;
     }
@@ -29,6 +31,8 @@ public class WaitingSlot : MonoBehaviour
 
     public void Clear()
     {
+        Debug.Log($"Clearing slot {name} at frame {Time.frameCount}");
+
         Occupant = null;
         isReserved = false;
 
