@@ -15,13 +15,13 @@ MonoBehaviour:
   colorRules:
   - carType: 0
     color: {r: 1, g: 0.015686274, b: 0.015686274, a: 1}
-    totalToSpawn: 7
-    spawnedCount: 1
+    totalToSpawn: 8
+    spawnedCount: 8
   - carType: 1
     color: {r: 0, g: 0.14202714, b: 1, a: 1}
-    totalToSpawn: 7
-    spawnedCount: 1
+    totalToSpawn: 8
+    spawnedCount: 8
   - carType: 2
     color: {r: 0.015686274, g: 1, b: 0.047151756, a: 1}
-    totalToSpawn: 7
-    spawnedCount: 2
+    totalToSpawn: 8
+    spawnedCount: 8

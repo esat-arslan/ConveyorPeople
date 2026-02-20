@@ -20,6 +20,7 @@ public class Car : MonoBehaviour
     private PickUpZoneSlot currentPickupSlot;
     public PickUpZoneSlot CurrentPickupSlot => currentPickupSlot;
     private Coroutine moveRoutine;
+    private CarGrid carGrid;
 
     public static event Action<Car> OnCarActivated;
     public static event Action<Car> OnCarDeactivated;
@@ -120,7 +121,7 @@ public class Car : MonoBehaviour
     {
         Vector3 target = exitTarget.position;
 
-        while((transform.position - target).sqrMagnitude > 0.01f)
+        while ((transform.position - target).sqrMagnitude > 0.01f)
         {
             transform.position = Vector3.MoveTowards(
                 transform.position,
@@ -138,14 +139,24 @@ public class Car : MonoBehaviour
     private void OnReachedExit()
     {
         SetActive(false);
-
-        // TODO
-        // implement return to pool when object pool gets implemented.
+        CarPool.Instance.Return(this);
     }
 
     internal void SetPickupSlot(PickUpZoneSlot pickUp)
     {
         currentPickupSlot = pickUp;
     }
+    public void SetSelectable(CarGrid grid)
+    {
+        carGrid = grid;
+    }
+    private void OnMouseDown()
+    {
+        if (!IsActive) 
+        {
+            carGrid?.OnCarSelected(this);
+        }
+    }
+
 }
 
