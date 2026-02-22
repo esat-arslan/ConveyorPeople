@@ -10,6 +10,11 @@ public class CarGrid : MonoBehaviour
 
     private List<Car> gridCars = new();
 
+    private void Awake()
+    {
+        spawnConfig.ResetRuntimeData();
+    }
+
     private void Start()
     {
         FillGrid();
@@ -17,6 +22,7 @@ public class CarGrid : MonoBehaviour
 
     public void FillGrid()
     {
+        Debug.Log($"Filling grid with {gridSlots.Length} slots.");
         for (int i = 0; i < gridSlots.Length; i++)
         {
             SpawnCarInSlot(i);
@@ -25,19 +31,40 @@ public class CarGrid : MonoBehaviour
 
     private void SpawnCarInSlot(int index)
     {
-        if (!spawnConfig.HasRemaning()) return;
+        if (!spawnConfig.HasRemaning())
+        {
+            Debug.LogWarning("SpawnConfig has no cars remaining to spawn.");
+            return;
+        }
 
         CarType? type = spawnConfig.GetNextType();
-        if (type == null) return;
+        if (type == null)
+        {
+            Debug.LogWarning("SpawnConfig returned null car type.");
+            return;
+        }
 
-        Car car = carPool.Get(type.Value);
-        if (car == null) return;
+        CarPool pool = carPool != null ? carPool : CarPool.Instance;
+        if (pool == null)
+        {
+            Debug.LogError("No CarPool found in scene or assigned!");
+            return;
+        }
+
+        Car car = pool.Get(type.Value);
+        if (car == null)
+        {
+            Debug.LogError($"Failed to get car of type {type.Value} from pool.");
+            return;
+        }
 
         car.transform.position = gridSlots[index].position;
+        car.gameObject.SetActive(true);
         car.SetActive(false);
         gridCars.Add(car);
 
         car.SetSelectable(this);
+        Debug.Log($"Spawned {type.Value} car in slot {index} at {gridSlots[index].position}");
     }
 
     public void OnCarSelected(Car car)

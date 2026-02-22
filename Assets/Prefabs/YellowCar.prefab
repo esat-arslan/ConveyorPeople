@@ -145,7 +145,7 @@ GameObject:
   - component: {fileID: 9095050044416270064}
   - component: {fileID: 3826706152897806769}
   m_Layer: 0
-  m_Name: GreenCar
+  m_Name: YellowCar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -220,7 +220,7 @@ SpriteRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 0.5854454, g: 0.9716981, b: 0.5729352, a: 1}
+  m_Color: {r: 0.7811142, g: 1, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -241,7 +241,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9d435b77eab354b2863e37881daebda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Car
-  carProperties: {fileID: 11400000, guid: 09e44c212e2d84b63b7a85a4456ad590, type: 2}
+  carProperties: {fileID: 11400000, guid: 168ae91a3106180a1b89cad8218e9bfb, type: 2}
   exitTarget: {fileID: 1098309155523048876, guid: 6360855c7497206c492ff1ea1895c845, type: 3}
   moveSpeed: 3
 --- !u!61 &3826706152897806769

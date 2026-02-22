@@ -241,6 +241,18 @@ public class Person : MonoBehaviour
     {
         GetComponent<SpriteRenderer>().color = color;
     }
+
+    public void ReturnToPool()
+    {
+        if (pool != null)
+        {
+            pool.Return(this);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 }
 
 public enum PersonStates { OnConveyor, Waiting }

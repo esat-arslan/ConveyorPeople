@@ -7,4 +7,4 @@ public class Car_SO : ScriptableObject
     public Color color;
     public int size;
 }
-public enum CarType { Red, Blue, Green }
+public enum CarType { Red, Blue, Green , Yellow}

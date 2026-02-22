@@ -15,10 +15,13 @@ MonoBehaviour:
   carRules:
   - carType: 0
     totalToSpawn: 2
-    spawnedCount: 0
+    spawnedCount: 1
   - carType: 1
     totalToSpawn: 2
-    spawnedCount: 0
+    spawnedCount: 1
   - carType: 2
     totalToSpawn: 2
-    spawnedCount: 0
+    spawnedCount: 2
+  - carType: 3
+    totalToSpawn: 2
+    spawnedCount: 2

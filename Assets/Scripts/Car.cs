@@ -119,7 +119,8 @@ public class Car : MonoBehaviour
 
     private IEnumerator MoveToExitRoutine()
     {
-        Vector3 target = exitTarget.position;
+        Transform targetTransform = exitTarget != null ? exitTarget : CarManager.Instance.ExitTarget;
+        Vector3 target = targetTransform.position;
 
         while ((transform.position - target).sqrMagnitude > 0.01f)
         {
@@ -134,6 +135,34 @@ public class Car : MonoBehaviour
         transform.position = target;
 
         OnReachedExit();
+    }
+
+    public void ResetState()
+    {
+        if (moveRoutine != null)
+        {
+            StopCoroutine(moveRoutine);
+            moveRoutine = null;
+        }
+
+        foreach (var person in people)
+        {
+            if (person != null)
+            {
+                person.ReturnToPool();
+            }
+        }
+        people.Clear();
+
+        foreach (var seat in seatSlots)
+        {
+            seat.Clear();
+        }
+
+        currentPickupSlot = null;
+        isActive = false;
+        carGrid = null;
+        CarManager.Instance.Unregister(this);
     }
 
     private void OnReachedExit()

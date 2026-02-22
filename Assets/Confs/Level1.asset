@@ -25,3 +25,7 @@ MonoBehaviour:
     color: {r: 0.015686274, g: 1, b: 0.047151756, a: 1}
     totalToSpawn: 8
     spawnedCount: 8
+  - carType: 3
+    color: {r: 1, g: 0.9903463, b: 0, a: 1}
+    totalToSpawn: 8
+    spawnedCount: 8

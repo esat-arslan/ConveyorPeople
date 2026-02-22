@@ -6,14 +6,18 @@ public class CarManager : MonoBehaviour
 {
     public static CarManager Instance { get; private set; }
 
+    [SerializeField] private Transform exitTarget;
+    public Transform ExitTarget => exitTarget;
+
     private readonly List<Car> activeCars = new();
     public IReadOnlyList<Car> ActiveCars => activeCars;
 
     private void Awake()
     {
-        if (Instance != null)
+        if (Instance != null && Instance != this)
         {
-            Destroy(gameObject);
+            Debug.LogWarning("Duplicate CarManager found, destroying extra component.");
+            Destroy(this);
             return;
         }
         Instance = this;

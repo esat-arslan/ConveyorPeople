@@ -198,7 +198,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Car
   carProperties: {fileID: 11400000, guid: 4977c38f9ed605406844a6a648353beb, type: 2}
-  exitTarget: {fileID: 0}
+  exitTarget: {fileID: 1098309155523048876, guid: 6360855c7497206c492ff1ea1895c845, type: 3}
   moveSpeed: 3
 --- !u!61 &2288485462227669972
 BoxCollider2D:
