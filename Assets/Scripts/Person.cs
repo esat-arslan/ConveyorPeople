@@ -6,7 +6,7 @@ using UnityEngine;
 public class Person : MonoBehaviour
 {
     private static int globalIdCounter = 0;
-    public int Id {get;private set;}
+    public int Id { get; private set; }
     [SerializeField] private float speed = 5f;
     [SerializeField] CarType personType;
     public CarType PersonType => personType;
@@ -30,6 +30,7 @@ public class Person : MonoBehaviour
     public event Action<Person> OnEndOfThePath;
     public event Action<Person> OnEnteredWaiting;
     private Coroutine movementCoroutine;
+    private PersonAnimation personAnimation;
 
     private ConveyorQueueSlot pendingQueueSlot;
     private bool isMoving;
@@ -44,6 +45,7 @@ public class Person : MonoBehaviour
         ResetState();
         currentWaypointIndex = 0;
         personState = PersonStates.OnConveyor;
+        personAnimation = GetComponent<PersonAnimation>();
     }
 
     public void AssignQueueSlot(ConveyorQueueSlot queueSlot)
@@ -83,14 +85,16 @@ public class Person : MonoBehaviour
 
     private IEnumerator FollowPathRoutine()
     {
+        Debug.Log("following path routine");
         if (conveyorPath is null) yield break;
-
         while (currentWaypointIndex <= maxAllowedWaypointIndex)
         {
             Vector3 target = conveyorPath.GetWaypointPos(currentWaypointIndex);
-
+            personAnimation.SetWalking(true);
             while ((transform.position - target).sqrMagnitude > 0.001f)
             {
+                bool isWalkingRight = this.IsWalkingRight(target);
+                personAnimation.SetDirection(isWalkingRight);
                 transform.position = Vector3.MoveTowards(
                     transform.position,
                     target,
@@ -108,6 +112,12 @@ public class Person : MonoBehaviour
 
             currentWaypointIndex++;
         }
+        personAnimation.SetWalking(false);
+    }
+
+    private bool IsWalkingRight(Vector3 target)
+    {
+        return target.x > transform.position.x;
     }
 
     private void StartMoveToSlot(ConveyorQueueSlot slot)
@@ -119,12 +129,17 @@ public class Person : MonoBehaviour
 
     private IEnumerator MoveDirectlyToSlot(ConveyorQueueSlot slot)
     {
+        Debug.Log("moving to directly to slot");
         isMoving = true;
 
         Vector3 target = slot.Position;
+        personAnimation.SetWalking(true);
 
         while ((transform.position - target).sqrMagnitude > 0.001f)
         {
+            bool isWalkingRight = this.IsWalkingRight(target);
+            personAnimation.SetDirection(isWalkingRight);
+
             transform.position = Vector3.MoveTowards(
                 transform.position,
                 target,
@@ -140,6 +155,7 @@ public class Person : MonoBehaviour
         slot.AssignToQueue(this);
 
         isMoving = false;
+        personAnimation.SetWalking(false);
 
         if (pendingQueueSlot != null)
         {
@@ -159,9 +175,14 @@ public class Person : MonoBehaviour
         }
 
         Vector3 target = assignedWaitingSlot.Position;
+        Debug.Log("moving to waiting slot");
+        personAnimation.SetWalking(true);
 
         while ((transform.position - target).sqrMagnitude > 0.001f)
         {
+            bool isWalkingRight = this.IsWalkingRight(target);
+            personAnimation.SetDirection(isWalkingRight);
+
             transform.position = Vector3.MoveTowards(
                transform.position,
                target,
@@ -171,6 +192,7 @@ public class Person : MonoBehaviour
         }
         transform.position = target;
         isMoving = false;
+        personAnimation.SetWalking(false);
 
         OnEnteredWaiting?.Invoke(this);
     }
@@ -209,9 +231,13 @@ public class Person : MonoBehaviour
     private IEnumerator MoveToCarRoutine(CarPersonSlot seatSlot, Action onReached)
     {
         Vector3 target = seatSlot.Position;
+        personAnimation.SetWalking(true);
 
         while ((transform.position - target).sqrMagnitude > 0.001f)
         {
+            bool isWalkingRight = this.IsWalkingRight(target);
+            personAnimation.SetDirection(isWalkingRight);
+
             transform.position = Vector3.MoveTowards(
                 transform.position,
                 target,
@@ -221,6 +247,7 @@ public class Person : MonoBehaviour
         }
 
         transform.position = target;
+        personAnimation.SetWalking(false);
 
         seatSlot.AssignToSlot(this);
         yield return null;

@@ -407,7 +407,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a8ee2ffbd2289e414aaf83e093f9127e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PersonPool
-  personPrefab: {fileID: 2328827632849130236, guid: 17482fbe9c3ed9abcaf004f3ce6611b3, type: 3}
+  personPrefab: {fileID: 6497104998268305104, guid: a8b9b3f80f71744c8b7664db72c386c5, type: 3}
   initialSize: 10
 --- !u!4 &360569006
 Transform:
