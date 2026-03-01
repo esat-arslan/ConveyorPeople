@@ -4,32 +4,34 @@ using UnityEngine;
 
 public class PersonPool : MonoBehaviour
 {
-    [SerializeField] private Person personPrefab;
-    [SerializeField] private int initialSize = 10;
+    [SerializeField] private int initializeSizePerPrefab = 5;
+    private readonly Dictionary<Person, Queue<Person>> pools = new();
 
-    private readonly Queue<Person> pool = new();
 
-    private void Awake()
+
+    private Person CreatePerson(Person prefab)
     {
-        for (int i = 0; i < initialSize; i++)
-        {
-            CreatePerson();
-        }
-    }
+        if (!pools.ContainsKey(prefab))
+            pools[prefab] = new Queue<Person>();
 
-    private Person CreatePerson()
-    {
-        Person person = Instantiate(personPrefab,transform);
+        Person person = Instantiate(prefab,transform);
+        person.SetOriginPrefab(prefab);
         person.gameObject.SetActive(false);
-        pool.Enqueue(person);
+
+        pools[prefab].Enqueue(person);
+
         return person;
     }
 
-    public Person Get()
+    public Person Get(Person prefab)
     {
-        if (pool.Count == 0) CreatePerson();
+        if(!pools.ContainsKey(prefab)) pools[prefab] = new Queue<Person>();
+        
+        
+        if(pools[prefab].Count == 0)
+            CreatePerson(prefab);
 
-        Person person = pool.Dequeue();
+        Person person = pools[prefab].Dequeue();
         person.gameObject.SetActive(true);
         person.ResetState();
         //Debug.Log($"GET PERSON ID: {person.GetInstanceID()}");
@@ -42,6 +44,7 @@ public class PersonPool : MonoBehaviour
         person.ResetState();
         person.gameObject.SetActive(false);
 
-        pool.Enqueue(person);
+ 
+        pools[person.OriginPrefab].Enqueue(person);
     }
 }

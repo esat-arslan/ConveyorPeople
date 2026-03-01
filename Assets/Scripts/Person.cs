@@ -26,6 +26,7 @@ public class Person : MonoBehaviour
 
     public ConveyorQueueSlot CurrentQueueSlot { get; private set; }
     public int AssignedQueueIndex { get; private set; } = -1;
+    public Person OriginPrefab { get; private set; }
 
     public event Action<Person> OnEndOfThePath;
     public event Action<Person> OnEnteredWaiting;
@@ -48,6 +49,11 @@ public class Person : MonoBehaviour
         personAnimation = GetComponent<PersonAnimation>();
     }
 
+    public void SetOriginPrefab(Person prefab)
+    {
+        OriginPrefab = prefab;
+    }
+    
     public void AssignQueueSlot(ConveyorQueueSlot queueSlot)
     {
         assignedQueueSlot = queueSlot;
@@ -264,10 +270,6 @@ public class Person : MonoBehaviour
         }
     }
 
-    public void SetVisual(Color color)
-    {
-        GetComponent<SpriteRenderer>().color = color;
-    }
 
     public void ReturnToPool()
     {

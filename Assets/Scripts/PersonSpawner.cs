@@ -40,12 +40,11 @@ public class PersonSpawner : MonoBehaviour
         SpawnPerson(rule);
     }
 
-    public void SpawnPerson(PersonSpawnConfig.ColorSpawnRule rule)
+    public void SpawnPerson(PersonSpawnConfig.PersonSpawnRule rule)
     {
-        Person person = pool.Get();
+        Person person = pool.Get(rule.prefab);
         person.transform.position = conveyorPath.StartPosition;
         person.Initialize(conveyorPath, pool, rule.carType);
-        person.SetVisual(rule.color);
         
         if (assignmentSystem.TryRegisterPerson(person))
         {

@@ -12,20 +12,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06c5961938c918efa90e4b3e96baed4b, type: 3}
   m_Name: Level1
   m_EditorClassIdentifier: Assembly-CSharp::PersonSpawnConfig
-  colorRules:
+  spawnRules:
   - carType: 0
-    color: {r: 1, g: 0.015686274, b: 0.015686274, a: 1}
     totalToSpawn: 8
-    spawnedCount: 8
+    prefab: {fileID: 4955013237840731533, guid: fa4ecccd122c95cbf8a522d438a39d47, type: 3}
+    spawnedCount: 0
   - carType: 1
-    color: {r: 0, g: 0.14202714, b: 1, a: 1}
     totalToSpawn: 8
-    spawnedCount: 8
+    prefab: {fileID: 4158316662595314219, guid: 3c518eb5d8ebbcd64af08610e0dfbf68, type: 3}
+    spawnedCount: 0
   - carType: 2
-    color: {r: 0.015686274, g: 1, b: 0.047151756, a: 1}
     totalToSpawn: 8
-    spawnedCount: 8
+    prefab: {fileID: 1972329403810451778, guid: 2a83edd788355a72993a5586f28907d8, type: 3}
+    spawnedCount: 0
   - carType: 3
-    color: {r: 1, g: 0.9903463, b: 0, a: 1}
     totalToSpawn: 8
-    spawnedCount: 8
+    prefab: {fileID: 6497104998268305104, guid: a8b9b3f80f71744c8b7664db72c386c5, type: 3}
+    spawnedCount: 0
